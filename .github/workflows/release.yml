@@ -25,7 +25,7 @@ jobs:
           node-version: lts/*
           cache: npm
       - name: Install all dependencies
-        run: npm ci
+        run: yarn install --frozen-lockfile
         env:
           NODE_ENV: development
       - name: Run automated tests
