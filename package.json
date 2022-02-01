@@ -1,6 +1,6 @@
 {
   "name": "@micalevisk/ssh-keygen",
-  "version": "0.2.0",
+  "version": "0.0.0-development",
   "description": "Generates SSH key-pairs",
   "main": "src/ssh-keygen",
   "types": "index.d.ts",
@@ -39,5 +39,28 @@
       "type": "MIT",
       "url": "https://github.com/micalevisk/ssh-keygen/blob/master/LICENSE.md"
     }
-  ]
+  ],
+  "scripts": {
+    "release:check": "semantic-release --dry-run",
+    "release": "semantic-release"
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/npm",
+      [
+        "@semantic-release/git",
+        {
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ]
+    ],
+    "branches": [
+      "master"
+    ]
+  },
+  "devDependencies": {
+    "@semantic-release/git": "^10.0.1",
+    "semantic-release": "^19.0.2"
+  }
 }
