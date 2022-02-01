@@ -9,6 +9,8 @@ Generates a SSH key-pair.
 
 ### Usage
 
+> **TIP**: If you set a non-empty string to the env. var. `VERBOSE`, you'll enable the verbose mode.
+
 ```js
 // With CommonJS
 const path = require('path');
