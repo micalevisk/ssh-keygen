@@ -41,8 +41,6 @@ declare function keygen(
 /**
  * Generates SSH key-pairs.
  */
-declare function keygen(
-  opts: Config & SshKeygenOptions,
-): Promise<{ key: string; pubKey: string }>;
+declare function keygen(opts: Config & SshKeygenOptions): Promise<{ key: string; pubKey: string }>;
 
-export default keygen
+export default keygen;
