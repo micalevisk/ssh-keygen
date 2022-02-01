@@ -1,2 +1,4 @@
 .github
 .vscode
+.prettierrc*
+.releaserc*
