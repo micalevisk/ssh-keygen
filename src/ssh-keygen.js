@@ -158,18 +158,17 @@ module.exports = function sshKeygen(opts = {}, callback = undefined) {
   if (!opts.format) opts.format = 'RFC4716';
 
   /**
-   * @param {Function} onSuccess
-   * @param {Function} onError
+   * @param {Function} onDoneErrorFirstCallback
    */
-  function run(onSuccess, onError) {
+  function run(onDoneErrorFirstCallback) {
     checkAvailability(location, opts.force, (err) => {
       if (err) {
         log('availability err ' + err);
-        onError(err);
+        onDoneErrorFirstCallback(err);
         return;
       }
 
-      execSshKeygen(location, opts, onSuccess);
+      execSshKeygen(location, opts, onDoneErrorFirstCallback);
     });
   }
 
@@ -177,6 +176,6 @@ module.exports = function sshKeygen(opts = {}, callback = undefined) {
     const util = require('util');
     return util.promisify(run)();
   } else {
-    run(callback, callback);
+    run(callback);
   }
 };
