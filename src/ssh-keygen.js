@@ -22,9 +22,12 @@ function binPath() {
 function checkAvailability(location, force, callback) {
   var pubLocation = location + '.pub';
   log('checking availability: ' + location);
-  fs.exists(location, function (keyExists) {
+
+  fs.access(location, fs.constants.R_OK | fs.constants.W_OK, function (keyAccessErr) {
     log('checking availability: ' + pubLocation);
-    fs.exists(pubLocation, function (pubKeyExists) {
+    var keyExists = !keyAccessErr;
+    fs.access(location, fs.constants.R_OK | fs.constants.W_OK, function (pubKeyAccessErr) {
+      var pubKeyExists = !pubKeyAccessErr;
       doForce(keyExists, pubKeyExists);
     });
   });
@@ -85,7 +88,7 @@ function ssh_keygen(location, opts, callback) {
     log('exited');
     if (read) {
       log('reading key ' + location);
-      fs.readFile(location, 'utf8', function (err, key) {
+      fs.readFile(location, 'utf8', function (_err, key) {
         if (destroy) {
           log('destroying key ' + location);
           fs.unlink(location, function (err) {
@@ -95,7 +98,7 @@ function ssh_keygen(location, opts, callback) {
         } else readPubKey();
         function readPubKey() {
           log('reading pub key ' + pubLocation);
-          fs.readFile(pubLocation, 'utf8', function (err, pubKey) {
+          fs.readFile(pubLocation, 'utf8', function (_err, pubKey) {
             if (destroy) {
               log('destroying pub key ' + pubLocation);
               fs.unlink(pubLocation, function (err) {
@@ -121,7 +124,7 @@ function ssh_keygen(location, opts, callback) {
   });
 }
 
-module.exports = function (opts, callback) {
+module.exports = function sshKeygen(opts, callback) {
   var location = opts.location;
   if (!location) location = path.join(os.tmpdir(), 'id_rsa');
 
