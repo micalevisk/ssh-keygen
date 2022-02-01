@@ -1,0 +1,37 @@
+name: Release and publish to NPM on pushes to main
+
+on:
+  ## Allow triggering this workflow manually via GitHub CLI/web
+  workflow_dispatch:
+
+  push:
+    branches:
+      - master
+    paths:
+      - 'src/**/*'
+      - '**.ts'
+      - 'package.json'
+      - 'yarn.lock'
+
+jobs:
+  test_and_release:
+    name: Build & test & release
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: lts/*
+          cache: npm
+      - name: Install all dependencies
+        run: npm ci
+        env:
+          NODE_ENV: development
+      - name: Run automated tests
+        run: npm run test --if-present
+      - name: Release it (if needed)
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
