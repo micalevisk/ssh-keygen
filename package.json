@@ -22,7 +22,7 @@
     "acess": "public"
   },
   "engines": {
-    "node": ">= 0.6.0"
+    "node": ">= 12.x"
   },
   "keywords": [
     "ssh",
@@ -41,26 +41,14 @@
     }
   ],
   "scripts": {
+    "format:fix": "prettier  --write .",
     "release:check": "semantic-release --dry-run",
     "release": "semantic-release"
   },
-  "release": {
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/npm",
-      [
-        "@semantic-release/git",
-        {
-          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-        }
-      ]
-    ],
-    "branches": [
-      "master"
-    ]
-  },
   "devDependencies": {
     "@semantic-release/git": "^10.0.1",
+    "@types/node": "^17.0.14",
+    "prettier": "^2.5.1",
     "semantic-release": "^19.0.2"
   }
 }
