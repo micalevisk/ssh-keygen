@@ -7,6 +7,7 @@ function runCallbackVersion(onDone) {
     {
       comment: 'john@doe.com',
       read: true,
+      destroy: true,
     },
     function (err, out) {
       if (err) {
@@ -29,6 +30,7 @@ async function runPromiseVersion(onDone) {
     const out = await keygen({
       comment: 'john@doe.com',
       read: true,
+      destroy: true,
     });
 
     console.log('Done generating key pairs');
