@@ -18,9 +18,12 @@ const keygen = require('@micalevisk/ssh-keygen');
 keygen(
   {
     location: path.join(__dirname, 'foo_rsa'),
+    read: true,
+    force: true,
+    destroy: false,
     comment: 'joe@foobar.com',
     password: 'keypassword',
-    read: true,
+    size: '2048',
     format: 'PEM',
   },
   // If you didn't provide this callback, a Promise will be returned instead
@@ -35,7 +38,7 @@ keygen(
 
 #### Parameters
 
-- **`location`**: desired location for the key. The public key will be at the location + `.pub`. Defaults a temporary directory
+- **`location`**: desired location for the key. The public key will be at the location + `.pub`. Defaults to a file called `id_rsa` inside a temporary directory
 - **`read`**: should the callback have the key files read into it. Defaults to `true`
 - **`force`**: destroy pre-existing files with the location name and the public key name. Defaults to `true`
 - **`destroy`**: destroy the key files once they have been read. Defaults to `false`
