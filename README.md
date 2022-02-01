@@ -1,5 +1,9 @@
 # ssh-keygen
 
+[![npm](https://img.shields.io/npm/v/@micalevisk/ssh-keygen.svg)](https://www.npmjs.com/package/@micalevisk/ssh-keygen)
+[![npm downloads](https://img.shields.io/npm/dt/@micalevisk/ssh-keygen.svg)](https://www.npmjs.com/package/@micalevisk/ssh-keygen)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@micalevisk/ssh-keygen.svg)](https://www.npmjs.com/package/@micalevisk/ssh-keygen)
+
 Generates a SSH key-pair.
 
 ### Install
