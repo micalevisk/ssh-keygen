@@ -34,7 +34,7 @@ function checkAvailability(location, force, callback) {
   fs.access(location, fs.constants.R_OK | fs.constants.W_OK, (keyAccessErr) => {
     log('checking availability: ' + pubLocation);
     const keyExists = !keyAccessErr;
-    fs.access(location, fs.constants.R_OK | fs.constants.W_OK, (pubKeyAccessErr) => {
+    fs.access(pubLocation, fs.constants.R_OK | fs.constants.W_OK, (pubKeyAccessErr) => {
       const pubKeyExists = !pubKeyAccessErr;
       doForce(keyExists, pubKeyExists);
     });
