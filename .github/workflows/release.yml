@@ -23,13 +23,13 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: lts/*
-          cache: npm
+          cache: yarn
       - name: Install all dependencies
         run: yarn install --frozen-lockfile
         env:
           NODE_ENV: development
       - name: Run automated tests
-        run: npm run test --if-present
+        run: npm t
       - name: Release it (if needed)
         run: npm run release
         env:

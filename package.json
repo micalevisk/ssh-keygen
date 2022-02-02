@@ -41,6 +41,7 @@
     }
   ],
   "scripts": {
+    "test": "node test",
     "format:fix": "prettier  --write .",
     "release:check": "semantic-release --dry-run",
     "release": "semantic-release"
