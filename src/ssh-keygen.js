@@ -4,10 +4,14 @@ const os = require('os');
 const path = require('path');
 const _ = require('./utils');
 
-function log(a) {
-  if (process.env.VERBOSE) console.log('ssh-keygen: ' + a);
+function log(msg) {
+  if (process.env.VERBOSE) console.log('ssh-keygen: ' + msg);
 }
 
+/**
+ * @throws {Error} If the platform is not supported.
+ * @returns Path to the binary `ssh-keygen` program.
+ */
 function binPath() {
   if (process.platform !== 'win32') return 'ssh-keygen';
 
@@ -29,11 +33,12 @@ function binPath() {
  */
 function checkAvailability(location, force, callback) {
   const pubLocation = location + '.pub';
-  log('checking availability: ' + location);
 
+  log('checking availability: ' + location);
   fs.access(location, fs.constants.R_OK | fs.constants.W_OK, (keyAccessErr) => {
-    log('checking availability: ' + pubLocation);
     const keyExists = !keyAccessErr;
+
+    log('checking availability: ' + pubLocation);
     fs.access(pubLocation, fs.constants.R_OK | fs.constants.W_OK, (pubKeyAccessErr) => {
       const pubKeyExists = !pubKeyAccessErr;
       doForce(keyExists, pubKeyExists);
@@ -51,18 +56,18 @@ function checkAvailability(location, force, callback) {
     if (!keyExists && !pubKeyExists) return callback();
     if (keyExists) {
       log('removing ' + location);
-      fs.unlink(location, (err) => {
-        if (err) return callback(err);
+      fs.unlink(location, (errorOnRemovingKey) => {
+        if (errorOnRemovingKey) return callback(errorOnRemovingKey);
         keyExists = false;
-        if (!keyExists && !pubKeyExists) callback();
+        if (!pubKeyExists) callback();
       });
     }
     if (pubKeyExists) {
       log('removing ' + pubLocation);
-      fs.unlink(pubLocation, (err) => {
-        if (err) return callback(err);
+      fs.unlink(pubLocation, (errorOnPubKey) => {
+        if (errorOnPubKey) return callback(errorOnPubKey);
         pubKeyExists = false;
-        if (!keyExists && !pubKeyExists) callback();
+        if (!keyExists) callback();
       });
     }
   }
@@ -78,6 +83,30 @@ function execSshKeygen(location, opts, callback) {
   const pubLocation = location + '.pub';
   const read = opts.read;
   const destroy = opts.destroy;
+
+  /**
+   * @param {string} key Private key found
+   */
+  const readPublicKeyAndFinish = (key) => {
+    log('reading pub key ' + pubLocation);
+    fs.readFile(pubLocation, 'utf8', (errorOnReadingPubKey, pubKey) => {
+      if (errorOnReadingPubKey) return callback(errorOnReadingPubKey);
+
+      if (!destroy) return callback(undefined, { key: key, pubKey: pubKey });
+
+      log('destroying pub key ' + pubLocation);
+      fs.unlink(pubLocation, (errorOnRemovingPubKey) => {
+        if (errorOnRemovingPubKey) return callback(errorOnRemovingPubKey);
+
+        key = key.toString();
+        key = key.substring(0, key.lastIndexOf('\n')).trim();
+        pubKey = pubKey.toString();
+        pubKey = pubKey.substring(0, pubKey.lastIndexOf('\n')).trim();
+
+        callback(undefined, { key: key, pubKey: pubKey });
+      });
+    });
+  };
 
   const keygen = spawn(binPath(), [
     '-t',
@@ -98,51 +127,27 @@ function execSshKeygen(location, opts, callback) {
     log('stdout:' + chunk);
   });
 
-  keygen.on('exit', () => {
-    log('exited');
-
-    if (!read) {
-      if (callback) callback();
-      return;
-    }
-
-    log('reading key ' + location);
-    fs.readFile(location, 'utf8', (_err, key) => {
-      if (destroy) {
-        log('destroying key ' + location);
-        fs.unlink(location, (err) => {
-          if (err) return callback(err);
-          readPubKey();
-        });
-      } else {
-        readPubKey();
-      }
-
-      function readPubKey() {
-        log('reading pub key ' + pubLocation);
-        fs.readFile(pubLocation, 'utf8', (_err, pubKey) => {
-          if (!destroy) {
-            callback(undefined, { key: key, pubKey: pubKey });
-            return;
-          }
-
-          log('destroying pub key ' + pubLocation);
-          fs.unlink(pubLocation, (err) => {
-            if (err) return callback(err);
-
-            key = key.toString();
-            key = key.substring(0, key.lastIndexOf('\n')).trim();
-            pubKey = pubKey.toString();
-            pubKey = pubKey.substring(0, pubKey.lastIndexOf('\n')).trim();
-            callback(undefined, { key: key, pubKey: pubKey });
-          });
-        });
-      }
-    });
-  });
-
   keygen.stderr.on('data', (chunk) => {
     log('stderr:' + chunk);
+  });
+
+  keygen.once('exit', () => {
+    log('exited');
+
+    if (!read) return callback();
+
+    log('reading key ' + location);
+    fs.readFile(location, 'utf8', (errorOnReadingKey, key) => {
+      if (errorOnReadingKey) return callback(errorOnReadingKey);
+
+      if (!destroy) return readPublicKeyAndFinish(key);
+
+      log('destroying key ' + location);
+      fs.unlink(location, (errorOnRemovingKey) => {
+        if (errorOnRemovingKey) return callback(errorOnRemovingKey);
+        readPublicKeyAndFinish(key);
+      });
+    });
   });
 }
 
