@@ -1,18 +1,20 @@
 const spawn = require('child_process').spawn;
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
 const _ = require('./utils');
 
-function log(msg) {
-  if (process.env.VERBOSE) console.log('ssh-keygen: ' + msg);
-}
+const log = (() => {
+  return process.env.VERBOSE
+    ? //
+      (msg) => console.log('ssh-keygen: ' + msg)
+    : () => {}; // Do nothing if logging is not enabled
+})();
 
 /**
  * @throws {Error} If the platform is not supported.
  * @returns Path to the binary `ssh-keygen` program.
  */
-function binPath() {
+const binPath = () => {
   if (process.platform !== 'win32') return 'ssh-keygen';
 
   switch (process.arch) {
@@ -23,7 +25,7 @@ function binPath() {
   }
 
   throw new Error('Unsupported platform');
-}
+};
 
 /**
  *
@@ -31,7 +33,7 @@ function binPath() {
  * @param {boolean} force
  * @param {(err?: any) => void} callback
  */
-function checkAvailability(location, force, callback) {
+const checkAvailability = (location, force, callback) => {
   const pubLocation = location + '.pub';
 
   log('checking availability: ' + location);
@@ -71,7 +73,29 @@ function checkAvailability(location, force, callback) {
       });
     }
   }
-}
+};
+
+/**
+ *
+ * @param {string} filePath The path to the file that sould be read.
+ * @param {boolean} shouldRemove Whether or not the file located at `filePath`
+ * should be removed before calling `doneCallback`.
+ * @param {(err?: NodeJS.ErrnoException, content?: string) => void} doneCallback
+ */
+const readFileAndRemove = (filePath, shouldRemove, doneCallback) => {
+  log('reading file ' + filePath);
+  fs.readFile(filePath, 'utf8', (errorOnReading, fileContent) => {
+    if (errorOnReading) return doneCallback(errorOnReading);
+    if (!shouldRemove) return doneCallback(undefined, fileContent);
+
+    log('removing file ' + filePath);
+    fs.unlink(filePath, (errorOnRemoving) => {
+      if (errorOnRemoving) return doneCallback(errorOnRemoving);
+
+      doneCallback(undefined, fileContent);
+    });
+  });
+};
 
 /**
  *
@@ -79,34 +103,10 @@ function checkAvailability(location, force, callback) {
  * @param { {read:boolean, destroy: boolean, size:string, comment:string, password:string, format:string} } opts
  * @param {(err?: any, out?: {key:string, pubKey:string}) => void} callback
  */
-function execSshKeygen(location, opts, callback) {
-  const pubLocation = location + '.pub';
-  const read = opts.read;
-  const destroy = opts.destroy;
-
-  /**
-   * @param {string} key Private key found
-   */
-  const readPublicKeyAndFinish = (key) => {
-    log('reading pub key ' + pubLocation);
-    fs.readFile(pubLocation, 'utf8', (errorOnReadingPubKey, pubKey) => {
-      if (errorOnReadingPubKey) return callback(errorOnReadingPubKey);
-
-      if (!destroy) return callback(undefined, { key: key, pubKey: pubKey });
-
-      log('destroying pub key ' + pubLocation);
-      fs.unlink(pubLocation, (errorOnRemovingPubKey) => {
-        if (errorOnRemovingPubKey) return callback(errorOnRemovingPubKey);
-
-        key = key.toString();
-        key = key.substring(0, key.lastIndexOf('\n')).trim();
-        pubKey = pubKey.toString();
-        pubKey = pubKey.substring(0, pubKey.lastIndexOf('\n')).trim();
-
-        callback(undefined, { key: key, pubKey: pubKey });
-      });
-    });
-  };
+const execSshKeygen = (location, opts, callback) => {
+  const shouldReadFiles = opts.read;
+  const shouldRemoveFiles = opts.destroy;
+  const pubkeyLocation = location + '.pub';
 
   const keygen = spawn(binPath(), [
     '-t',
@@ -134,25 +134,25 @@ function execSshKeygen(location, opts, callback) {
   keygen.once('exit', () => {
     log('exited');
 
-    if (!read) return callback();
+    if (!shouldReadFiles) return callback(undefined, undefined);
 
-    log('reading key ' + location);
-    fs.readFile(location, 'utf8', (errorOnReadingKey, key) => {
+    readFileAndRemove(location, shouldRemoveFiles, (errorOnReadingKey, key) => {
       if (errorOnReadingKey) return callback(errorOnReadingKey);
 
-      if (!destroy) return readPublicKeyAndFinish(key);
+      readFileAndRemove(pubkeyLocation, shouldRemoveFiles, (errorOnReadingPubKey, pubKey) => {
+        if (errorOnReadingPubKey) return callback(errorOnReadingPubKey);
 
-      log('destroying key ' + location);
-      fs.unlink(location, (errorOnRemovingKey) => {
-        if (errorOnRemovingKey) return callback(errorOnRemovingKey);
-        readPublicKeyAndFinish(key);
+        callback(undefined, {
+          key: key.substring(0, key.lastIndexOf('\n')).trim(),
+          pubKey: pubKey.substring(0, pubKey.lastIndexOf('\n')).trim(),
+        });
       });
     });
   });
-}
+};
 
 module.exports = function sshKeygen(opts = {}, callback = undefined) {
-  const location = opts.location || path.join(os.tmpdir(), 'id_rsa');
+  const location = opts.location || path.join(require('os').tmpdir(), 'id_rsa');
 
   if (_.isUndefined(opts.read)) opts.read = true;
   if (_.isUndefined(opts.force)) opts.force = true;
@@ -162,10 +162,17 @@ module.exports = function sshKeygen(opts = {}, callback = undefined) {
   if (!opts.size) opts.size = '2048';
   if (!opts.format) opts.format = 'RFC4716';
 
+  if (_.isUndefined(callback)) {
+    const util = require('util');
+    return util.promisify(runSshKeygen)();
+  } else {
+    runSshKeygen(callback);
+  }
+
   /**
    * @param {Function} onDoneErrorFirstCallback
    */
-  function run(onDoneErrorFirstCallback) {
+  function runSshKeygen(onDoneErrorFirstCallback) {
     checkAvailability(location, opts.force, (err) => {
       if (err) {
         log('availability err ' + err);
@@ -175,12 +182,5 @@ module.exports = function sshKeygen(opts = {}, callback = undefined) {
 
       execSshKeygen(location, opts, onDoneErrorFirstCallback);
     });
-  }
-
-  if (_.isUndefined(callback)) {
-    const util = require('util');
-    return util.promisify(run)();
-  } else {
-    run(callback);
   }
 };
