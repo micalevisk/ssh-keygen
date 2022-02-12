@@ -32,8 +32,9 @@ keygen(
     size: '2048',
     format: 'PEM',
   },
-  // If you didn't provide this callback, a Promise will be returned instead
+  // If you omit this callback function, a Promise will be returned instead!
   function onDoneCallback(err, out) {
+    // The error could be related to ssh-keygen binary or file system errors.
     if (err) return console.error('Something went wrong:', err);
     console.log('Keys created!');
     console.log('private key:', out.key);
@@ -41,6 +42,8 @@ keygen(
   },
 );
 ```
+
+Read about the expected types [here](./index.d.ts).
 
 #### Parameters
 

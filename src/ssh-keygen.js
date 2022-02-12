@@ -104,9 +104,10 @@ const readFileAndRemove = (filePath, shouldRemove, doneCallback) => {
  * @param {(err?: any, out?: {key:string, pubKey:string}) => void} callback
  */
 const execSshKeygen = (location, opts, callback) => {
-  const shouldReadFiles = opts.read;
-  const shouldRemoveFiles = opts.destroy;
   const pubkeyLocation = location + '.pub';
+  let shouldReadFiles = opts.read;
+  let shouldRemoveFiles = opts.destroy;
+  let stderrMsg = '';
 
   const keygen = spawn(binPath(), [
     '-t',
@@ -128,13 +129,21 @@ const execSshKeygen = (location, opts, callback) => {
   });
 
   keygen.stderr.on('data', (chunk) => {
+    stderrMsg += chunk.toString();
     log('stderr:' + chunk);
   });
 
   keygen.once('exit', () => {
     log('exited');
 
-    if (!shouldReadFiles) return callback(undefined, undefined);
+    // The ssh-keygen errored-out, thus it has not created the files. Then
+    // we could skip file read & deletion operations.
+    if (stderrMsg) {
+      shouldReadFiles = false;
+      shouldRemoveFiles = false;
+    }
+
+    if (!shouldReadFiles) return callback(stderrMsg ? stderrMsg : undefined, undefined);
 
     readFileAndRemove(location, shouldRemoveFiles, (errorOnReadingKey, key) => {
       if (errorOnReadingKey) return callback(errorOnReadingKey);
