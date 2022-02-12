@@ -133,8 +133,8 @@ const execSshKeygen = (location, opts, callback) => {
     log('stderr:' + chunk);
   });
 
-  keygen.once('exit', () => {
-    log('exited');
+  keygen.once('exit', (exitCode) => {
+    log('exited with code:' + exitCode);
 
     // The ssh-keygen errored-out, thus it has not created the files. Then
     // we could skip file read & deletion operations.
