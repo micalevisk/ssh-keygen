@@ -163,13 +163,13 @@ const execSshKeygen = (location, opts, callback) => {
 module.exports = function sshKeygen(opts = {}, callback = undefined) {
   const location = opts.location || path.join(require('os').tmpdir(), 'id_rsa');
 
-  if (_.isUndefined(opts.read)) opts.read = true;
-  if (_.isUndefined(opts.force)) opts.force = true;
-  if (_.isUndefined(opts.destroy)) opts.destroy = false;
-  if (!opts.comment) opts.comment = '';
-  if (!opts.password) opts.password = '';
-  if (!opts.size) opts.size = '2048';
-  if (!opts.format) opts.format = 'RFC4716';
+  opts.read = _.isUndefined(opts.read) ? true : opts.read;
+  opts.force = _.isUndefined(opts.force) ? true : opts.force;
+  opts.destroy = _.isUndefined(opts.destroy) ? false : opts.destroy;
+  opts.comment = opts.comment || '';
+  opts.password = opts.password || '';
+  opts.size = opts.size || '2048';
+  opts.format = opts.format || 'RFC4716';
 
   if (_.isUndefined(callback)) {
     const util = require('util');

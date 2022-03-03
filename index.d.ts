@@ -8,9 +8,15 @@ interface Config {
 }
 
 interface SshKeygenOptions {
-  /** Provides a new comment to `shh-keygen` utility. */
+  /**
+   * Provides a new comment to `shh-keygen` utility.
+   * @default ''
+   */
   comment?: string;
-  /** Provides the new passphrase. */
+  /**
+   * Provides the new passphrase.
+   * @default ''
+   */
   password?: string;
   /**
    * Specifies the number of bits in the key to create. The minimum size is
