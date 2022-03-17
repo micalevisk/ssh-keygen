@@ -1,15 +1,15 @@
 # ssh-keygen
 
-[![npm](https://img.shields.io/npm/v/@micalevisk/ssh-keygen.svg)](https://www.npmjs.com/package/@micalevisk/ssh-keygen)
-[![npm downloads](https://img.shields.io/npm/dt/@micalevisk/ssh-keygen.svg)](https://www.npmjs.com/package/@micalevisk/ssh-keygen)
-[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@micalevisk/ssh-keygen.svg)](https://www.npmjs.com/package/@micalevisk/ssh-keygen)
+[![npm](https://img.shields.io/npm/v/ssh-keygen-lite.svg)](https://www.npmjs.com/package/ssh-keygen-lite)
+[![npm downloads](https://img.shields.io/npm/dt/ssh-keygen-lite.svg)](https://www.npmjs.com/package/ssh-keygen-lite)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/ssh-keygen-lite.svg)](https://www.npmjs.com/package/ssh-keygen-lite)
 
 Generates a SSH key-pair.
 
 ### Install
 
-1. Make sure you have ssh-keygen (try `$ ssh-keygen` if you aren't sure)
-2. Run `npm install @micalevisk/ssh-keygen` if you're using NPM
+1. Make sure you have [ssh-keygen](https://linux.die.net/man/1/ssh-keygen). Try `$ ssh-keygen` if you aren't sure
+2. Run `npm install ssh-keygen-lite` if you're using NPM
 
 ### Usage
 
@@ -19,7 +19,7 @@ Generates a SSH key-pair.
 // With CommonJS
 const path = require('path');
 const fs = require('fs');
-const keygen = require('@micalevisk/ssh-keygen');
+const keygen = require('ssh-keygen-lite');
 
 keygen(
   {
@@ -93,7 +93,7 @@ It is advisable to generate your keys on a machine with a significant random sou
 
 ### License
 
-`@micalevisk/ssh-keygen` is [open source](./LICENSE.md) under the MIT license.
+`ssh-keygen-lite` is [open source](./LICENSE.md) under the MIT license.
 
 All credits go to [**Eric Vicenti**](https://github.com/ericvicenti).
 
