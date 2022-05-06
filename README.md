@@ -4,16 +4,17 @@
 [![npm downloads](https://img.shields.io/npm/dt/ssh-keygen-lite.svg)](https://www.npmjs.com/package/ssh-keygen-lite)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/ssh-keygen-lite.svg)](https://www.npmjs.com/package/ssh-keygen-lite)
 
-Generates a SSH key-pair.
+Generates a SSH key-pair using.
 
 ### Install
 
-1. Make sure you have [ssh-keygen](https://linux.die.net/man/1/ssh-keygen). Try `$ ssh-keygen` if you aren't sure
+1. Make sure you have [`ssh-keygen`](https://linux.die.net/man/1/ssh-keygen) installed in your machine. Try `$ ssh-keygen` if you aren't sure
 2. Run `npm install ssh-keygen-lite` if you're using NPM
 
 ### Usage
 
-> **TIP**: If you set a non-empty string to the env. var. `VERBOSE`, you'll enable the verbose mode.
+> **TIP**: If you set a non-empty string to the environment variable `VERBOSE`, you'll enable the verbose mode.  
+> Logs from the lib are prefixed by `ssh-keygen-lie:` while logs from the binary `ssh-keygen` are emitted with the prefix `ssh-keygen:`
 
 ```js
 // With CommonJS
