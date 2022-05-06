@@ -5,3 +5,11 @@
  * @returns {boolean} `true` if `value` is `undefined`
  */
 module.exports.isUndefined = (value) => value === void 0;
+
+/** @type {(context: string) => (msg: string) => void} */
+module.exports.makeLogger = (context = 'ssh-keygen-lite') => {
+  return process.env.VERBOSE
+    ? //
+      (msg) => console.log(`${context}: ${msg}`)
+    : () => {}; // Do nothing if logging is not enabled
+};

@@ -3,12 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('./utils');
 
-const log = (() => {
-  return process.env.VERBOSE
-    ? //
-      (msg) => console.log('ssh-keygen: ' + msg)
-    : () => {}; // Do nothing if logging is not enabled
-})();
+const log = _.makeLogger();
+const sshKeygenLog = _.makeLogger('ssh-keygen');
 
 /**
  * @throws {Error} If the platform is not supported.
@@ -125,16 +121,16 @@ const execSshKeygen = (location, opts, callback) => {
   ]);
 
   keygen.stdout.on('data', (chunk) => {
-    log('stdout:' + chunk);
+    sshKeygenLog('stdout:' + chunk);
   });
 
   keygen.stderr.on('data', (chunk) => {
     stderrMsg += chunk.toString();
-    log('stderr:' + chunk);
+    sshKeygenLog('stderr:' + chunk);
   });
 
   keygen.once('exit', (exitCode) => {
-    log('exited with code:' + exitCode);
+    sshKeygenLog('exited with code:' + exitCode);
 
     // The ssh-keygen errored-out, thus it has not created the files. Then
     // we could skip file read & deletion operations.
