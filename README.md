@@ -23,6 +23,7 @@ const keygen = require('ssh-keygen-lite');
 
 keygen(
   {
+    // sshKeygenPath: 'ssh-keygen',
     location: path.join(__dirname, 'foo_rsa'),
     read: true,
     force: true,

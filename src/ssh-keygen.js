@@ -1,4 +1,4 @@
-const spawn = require('child_process').spawn;
+const { spawn, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const _ = require('./utils');
@@ -7,20 +7,48 @@ const log = _.makeLogger();
 const sshKeygenLog = _.makeLogger('ssh-keygen');
 
 /**
- * @throws {Error} If the platform is not supported.
- * @returns Path to the binary `ssh-keygen` program.
+ * @param {string} fullPathToTheExecutable
+ * @returns {{ error?: Error, isAvailable: boolean }}
  */
-const binPath = () => {
-  if (process.platform !== 'win32') return 'ssh-keygen';
+const isBinaryAvailability = (fullPathToTheExecutable) => {
+  log(`checking if the binary "${fullPathToTheExecutable}" exists`);
+
+  try {
+    const result = spawnSync(fullPathToTheExecutable, ['test']);
+    if (result.error) throw result.error;
+    return {
+      isAvailable: true,
+    };
+  } catch (err) {
+    log(err.message);
+    return {
+      error: err,
+      isAvailable: false,
+    };
+  }
+};
+
+/**
+ * @param {string} pathToSshKeygen
+ */
+const resolveBinaryPath = (pathToSshKeygen) => {
+  const pathsToCheck = [pathToSshKeygen];
 
   switch (process.arch) {
     case 'ia32':
-      return path.join(__dirname, '..', 'bin', 'ssh-keygen-32.exe');
+      pathsToCheck.push(path.join(__dirname, '..', 'bin', 'ssh-keygen-32.exe'));
+      break;
     case 'x64':
-      return path.join(__dirname, '..', 'bin', 'ssh-keygen-64.exe');
+      pathsToCheck.push(path.join(__dirname, '..', 'bin', 'ssh-keygen-64.exe'));
+      break;
   }
 
-  throw new Error('Unsupported platform');
+  for (const path of pathsToCheck) {
+    const { isAvailable } = isBinaryAvailability(path);
+    if (isAvailable) return path;
+  }
+
+  throw new Error(`Unsupported platform or invalid path to the binary (${pathToSshKeygen})`);
 };
 
 /**
@@ -96,7 +124,7 @@ const readFileAndRemove = (filePath, shouldRemove, doneCallback) => {
 /**
  *
  * @param {string} location
- * @param { {read:boolean, destroy: boolean, size:string, comment:string, password:string, format:string} } opts
+ * @param { {sshKeygenPath: string, read:boolean, destroy: boolean, size:string, comment:string, password:string, format:string} } opts
  * @param {(err?: any, out?: {key:string, pubKey:string}) => void} callback
  */
 const execSshKeygen = (location, opts, callback) => {
@@ -105,7 +133,7 @@ const execSshKeygen = (location, opts, callback) => {
   let shouldRemoveFiles = opts.destroy;
   let stderrMsg = '';
 
-  const keygen = spawn(binPath(), [
+  const keygen = spawn(opts.sshKeygenPath, [
     '-t',
     'rsa',
     '-b',
@@ -166,6 +194,7 @@ module.exports = function sshKeygen(opts = {}, callback = undefined) {
   opts.read = _.isUndefined(opts.read) ? true : opts.read;
   opts.force = _.isUndefined(opts.force) ? true : opts.force;
   opts.destroy = _.isUndefined(opts.destroy) ? false : opts.destroy;
+  opts.sshKeygenPath = resolveBinaryPath(opts.sshKeygenPath || 'ssh-keygen');
   opts.comment = opts.comment || '';
   opts.password = opts.password || '';
   opts.size = opts.size || '2048';

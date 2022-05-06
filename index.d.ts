@@ -5,6 +5,12 @@ interface Config {
   read?: boolean;
   force?: boolean;
   destroy?: boolean;
+  /**
+   * Path to the executable `ssh-keygen`.
+   * You will get an error if this path isn't valid.
+   * @default 'ssh-keygen'
+   */
+  sshKeygenPath?: string;
 }
 
 interface SshKeygenOptions {
