@@ -18,7 +18,6 @@ Generates a SSH key-pair.
 ```js
 // With CommonJS
 const path = require('path');
-const fs = require('fs');
 const keygen = require('ssh-keygen-lite');
 
 keygen(
