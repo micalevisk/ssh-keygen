@@ -141,6 +141,10 @@ const execSshKeygen = (location, opts, callback) => {
 
     if (!shouldReadFiles) return callback(stderrMsg ? stderrMsg : undefined, undefined);
 
+    // The ssh-keygen errored-out with no error message. Then we need to propage
+    // the exit code to the user.
+    if (exitCode) return callback(`ssh-keygen exited with code: ${exitCode}`, undefined);
+
     readFileAndRemove(location, shouldRemoveFiles, (errorOnReadingKey, key) => {
       if (errorOnReadingKey) return callback(errorOnReadingKey);
 
