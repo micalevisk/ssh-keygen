@@ -12,7 +12,7 @@
   "maintainers": [
     "Micael Levi Lima Cavalcante (https://micalevisk.github.io)"
   ],
-  "homepage": "http://github.com/micalevisk/ssh-keygen",
+  "homepage": "http://github.com/micalevisk/ssh-keygen-lite",
   "repository": {
     "type": "git",
     "url": "git://github.com/micalevisk/ssh-keygen.git"
@@ -32,12 +32,12 @@
     "public"
   ],
   "bugs": {
-    "url": "http://github.com/micalevisk/ssh-keygen/issues"
+    "url": "http://github.com/micalevisk/ssh-keygen-lite/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/micalevisk/ssh-keygen/blob/master/LICENSE.md"
+      "url": "https://github.com/micalevisk/ssh-keygen-lite/blob/master/LICENSE.md"
     }
   ],
   "scripts": {
