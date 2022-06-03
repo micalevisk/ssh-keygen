@@ -135,7 +135,7 @@ const execSshKeygen = (location, opts, callback) => {
 
   const keygen = spawn(opts.sshKeygenPath, [
     '-t',
-    'rsa',
+    opts.type,
     '-b',
     opts.size,
     '-C',
@@ -189,7 +189,7 @@ const execSshKeygen = (location, opts, callback) => {
 };
 
 module.exports = function sshKeygen(opts = {}, callback = undefined) {
-  const location = opts.location || path.join(require('os').tmpdir(), 'id_rsa');
+  const location = opts.location || path.join(require('os').tmpdir(), `id_${opts.type}`);
 
   opts.read = _.isUndefined(opts.read) ? true : opts.read;
   opts.force = _.isUndefined(opts.force) ? true : opts.force;
@@ -199,6 +199,7 @@ module.exports = function sshKeygen(opts = {}, callback = undefined) {
   opts.password = opts.password || '';
   opts.size = opts.size || '2048';
   opts.format = opts.format || 'RFC4716';
+  opts.type = opts.type || 'rsa';
 
   if (_.isUndefined(callback)) {
     const util = require('util');

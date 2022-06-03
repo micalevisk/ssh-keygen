@@ -7,6 +7,7 @@ function runCallbackVersion(onDone) {
     {
       comment: 'john@doe.com',
       read: true,
+      type: 'ed25519',
       destroy: true,
     },
     function (err, out) {
