@@ -189,7 +189,7 @@ const execSshKeygen = (location, opts, callback) => {
 };
 
 module.exports = function sshKeygen(opts = {}, callback = undefined) {
-  const location = opts.location || path.join(require('os').tmpdir(), 'id_rsa');
+  const location = opts.location || path.join(require('os').tmpdir(), `id_${opts.type}`);
 
   opts.read = _.isUndefined(opts.read) ? true : opts.read;
   opts.force = _.isUndefined(opts.force) ? true : opts.force;

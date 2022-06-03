@@ -16,9 +16,9 @@ interface Config {
 interface SshKeygenOptions {
   /**
    * Provides the type of the key to be generated.
-   * @default rsa
+   * @default 'rsa'
    */
-  type?: string;
+  type?: 'dsa' | 'ecdsa' | 'ecdsa-sk' | 'ed25519' | 'ed25519-sk' | 'rsa';
   /**
    * Provides a new comment to `shh-keygen` utility.
    * @default ''

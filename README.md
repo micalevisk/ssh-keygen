@@ -25,6 +25,7 @@ keygen(
   {
     // sshKeygenPath: 'ssh-keygen',
     location: path.join(__dirname, 'foo_rsa'),
+    type: 'rsa',
     read: true,
     force: true,
     destroy: false,
@@ -49,6 +50,7 @@ Read about the expected types [here](./index.d.ts).
 #### Parameters
 
 - **`location`**: desired location for the key. The public key will be at the location + `.pub`. Defaults to a file called `id_rsa` inside a temporary directory
+- **`type`**: type of the SSH key that is generated. Defaults to `rsa`.
 - **`read`**: should the callback have the key files read into it. Defaults to `true`
 - **`force`**: destroy pre-existing files with the location name and the public key name. Defaults to `true`
 - **`destroy`**: destroy the key files once they have been read. Defaults to `false`
