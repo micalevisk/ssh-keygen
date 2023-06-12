@@ -49,21 +49,21 @@ Read about the expected types [here](./index.d.ts).
 
 #### Parameters
 
-- **`location`**: desired location for the key. The public key will be at the location + `.pub`. Defaults to a file called `id_rsa` inside a temporary directory
+- **`location`**: desired location for the key. The public key will be at the location + `.pub`. Defaults to a file called `id_rsa` inside a temporary directory.
 - **`type`**: type of the SSH key that is generated. Defaults to `rsa`.
-- **`read`**: should the callback have the key files read into it. Defaults to `true`
-- **`force`**: destroy pre-existing files with the location name and the public key name. Defaults to `true`
-- **`destroy`**: destroy the key files once they have been read. Defaults to `false`
-- **`comment`**: the comment that should be embedded into the key. Defaults to an empty `string`
-- **`password`**: the password for the key. Falsy values will turn this into an empty string. Defaults to an empty `string`
-- **`size`**: Specifies the number of bits (as `string`) in the key to create. Defaults to `'2048'`
-- **`format`**: Specify a key format for key generation. Defaults to `'RFC4716'`
+- **`read`**: should the callback have the key files read into it. Defaults to `true`.
+- **`force`**: destroy pre-existing files with the location name and the public key name. Defaults to `true`.
+- **`destroy`**: destroy the key files once they have been read. Defaults to `false`.
+- **`comment`**: the comment that should be embedded into the key. Defaults to an empty `string`.
+- **`password`**: the password for the key. Falsy values will turn this into an empty string. Defaults to an empty `string`.
+- **`size`**: Specifies the number of bits (as `string`) in the key to create. Defaults to `'2048'`.
+- **`format`**: Specify a key format for key generation. Defaults to `'RFC4716'`.
 
 #### Promise-based API
 
-> **NOTE:** You'll need NodeJS version 8 or later because it's rely on [`util.promisify`](https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_promisify_original) utility.
+> **NOTE:** You'll need NodeJS version 8 or later because it relies on the [`util.promisify`](https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_promisify_original) utility.
 
-If you don't supply the second parameter to `keygen` (ie., the callback), then it will return a Promise that resolves to a plain object with `key` and `pubkey` properties.
+If you don't supply the second parameter to `keygen` (i.e., the callback), then it will return a Promise that resolves to a plain object with `key` and `pubkey` properties.
 
 ### How it works
 
