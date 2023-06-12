@@ -63,7 +63,7 @@ Read about the expected types [here](./index.d.ts).
 
 > **NOTE:** You'll need NodeJS version 8 or later because it's rely on [`util.promisify`](https://nodejs.org/dist/latest-v8.x/docs/api/util.html#util_util_promisify_original) utility.
 
-If you don't supply the second parameter to `keygen` (ie., the callback), then it will return a Promise that resolves to an plain object with `key` and `pubkey` properties.
+If you don't supply the second parameter to `keygen` (ie., the callback), then it will return a Promise that resolves to a plain object with `key` and `pubkey` properties.
 
 ### How it works
 
